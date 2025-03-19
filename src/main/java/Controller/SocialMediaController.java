@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Account;
 import Service.AccountService;
+import Model.Message;
 import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -49,6 +50,10 @@ public class SocialMediaController {
         context.json("sample text");
     }
 
+    /**
+     * This is the handler for registering a new user.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void newUserRegistrationHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
@@ -60,6 +65,10 @@ public class SocialMediaController {
         }
     }
 
+    /**
+     * This is the handler for registering a user login.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void userLoginHandler(Context ctx) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
@@ -72,26 +81,57 @@ public class SocialMediaController {
         }
     }
 
-    private void postMessageHandler(Context ctx) {
-
+    /**
+     * This is the handler for posting a new message.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
+    private void postMessageHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(ctx.body(), Message.class);
+        Message addedMessage = messageService.newMessage(message);
+        if(addedMessage==null){
+            ctx.status(400);
+        }else{
+            ctx.json(mapper.writeValueAsString(addedMessage));
+        }
     }
 
+    /**
+     * This is the handler for getting all Messages.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void getAllMessagesHandler(Context ctx) {
 
     }
 
+    /**
+     * This is the handler for getting a message by its ID
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void getMessageByIDHandler(Context ctx) {
 
     }
 
+    /**
+     * This is the handler for deleting a message by its ID.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void deleteMessageByIDHandler(Context ctx) {
 
     }
 
+    /**
+     * This is the handler updating a message.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void updateMessageHandler(Context ctx) {
 
     }
-
+    
+    /**
+     * This is the handler for getting all messages posted by a specified user.
+     * @param context The Javalin Context object manages information about both the HTTP request and response.
+     */
     private void getMessagesByUserHandler(Context ctx) {
 
     }

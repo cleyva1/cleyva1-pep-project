@@ -111,9 +111,13 @@ public class SocialMediaController {
      * This is the handler for getting a message by its ID
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void getMessageByIDHandler(Context ctx) {
-
-    }
+    private void getMessageByIDHandler(Context ctx) throws JsonProcessingException {
+        Integer id = Integer.parseInt(ctx.pathParam("message_id"));
+        Message returnMessage = messageService.getMessage(id);
+        if (returnMessage != null) {
+            ctx.json(returnMessage);
+        }
+   }
 
     /**
      * This is the handler for deleting a message by its ID.

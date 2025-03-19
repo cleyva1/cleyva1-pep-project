@@ -1,5 +1,11 @@
 package Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import Model.Account;
+import Service.AccountService;
+import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -9,6 +15,13 @@ import io.javalin.http.Context;
  * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
  */
 public class SocialMediaController {
+    AccountService accountService;
+    MessageService messageService;
+    public SocialMediaController() {
+        accountService = new AccountService();
+        messageService = new MessageService();
+    }
+
     /**
      * In order for the test cases to work, you will need to write the endpoints in the startAPI() method, as the test
      * suite must receive a Javalin object from this method.
@@ -24,7 +37,7 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIDHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIDHandler);
         app.patch("/messages/{message_id}", this::updateMessageHandler);
-        app.get("/accounts/{account_id}", this::getMessagesByUserHandler);
+        app.get("/accounts/{account_id}/messages", this::getMessagesByUserHandler);
         return app;
     }
 
@@ -36,12 +49,27 @@ public class SocialMediaController {
         context.json("sample text");
     }
 
-    private void newUserRegistrationHandler(Context ctx) {
-    
+    private void newUserRegistrationHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        Account addedAccount = accountService.addAccount(account);
+        if(addedAccount==null){
+            ctx.status(400);
+        }else{
+            ctx.json(mapper.writeValueAsString(addedAccount));
+        }
     }
 
-    private void userLoginHandler(Context ctx) {
-
+    private void userLoginHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(ctx.body(), Account.class);
+        boolean loginFlag = accountService.loginIsSuccessful(account);
+        Account returnAccount = accountService.getAccount(account);
+        if(loginFlag){
+            ctx.json(mapper.writeValueAsString(returnAccount));
+        }else{
+            ctx.status(401);
+        }
     }
 
     private void postMessageHandler(Context ctx) {
@@ -49,7 +77,7 @@ public class SocialMediaController {
     }
 
     private void getAllMessagesHandler(Context ctx) {
-        
+
     }
 
     private void getMessageByIDHandler(Context ctx) {

@@ -1,6 +1,6 @@
 package DAO;
 
-import Model.Account;
+
 import Model.Message;
 import Util.ConnectionUtil;
 
@@ -78,6 +78,39 @@ public class MessageDAO {
         }
         return null;
     }
+
+    public void deleteMessage(int id) {
+        Connection connection = ConnectionUtil.getConnection();
+        try {  
+            String sql = "DELETE FROM message WHERE message_id = ?;";
+            
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+            
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void updateMessage(int id, String messageString) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {  
+            String sql = "UPDATE message SET message_text = ? WHERE message_id = ?;";
+            
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(2, id);
+            preparedStatement.setString(1, messageString);
+            preparedStatement.executeUpdate();
+
+            
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        
+    }
     
     public List<Message> getAllMessagesByAccountID(int accountID) {
         Connection connection = ConnectionUtil.getConnection();
@@ -87,6 +120,7 @@ public class MessageDAO {
             String sql = "SELECT * FROM message WHERE posted_by = ?;";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, accountID);
             ResultSet rs = preparedStatement.executeQuery();
             while(rs.next()){
                 Message message = new Message(rs.getInt("message_id"), 
